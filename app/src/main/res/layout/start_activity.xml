@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" xmlns:tools="http://schemas.android.com/tools"
+                android:background="#212121" tools:context=".MainActivity">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="40dp" android:paddingTop="30dp"
+            android:paddingRight="40dp"
+            android:id="@+id/linearLayout" android:layout_gravity="center" android:layout_alignParentBottom="false"
+            android:layout_alignParentEnd="false" android:gravity="center_vertical">
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp" android:background="#DD212121">
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageView2"
+                    tools:src="@drawable/canvas"
+                    android:layout_alignParentStart="true" android:layout_toStartOf="@+id/textView2"
+                    android:layout_alignParentEnd="true"/>
+            <TextView
+                    android:textColor="@color/materialcolorpicker__white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/homeScreenNewCanvas"
+                    android:id="@+id/textView2"
+                    android:layout_centerVertical="true" android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp" android:background="#AAffaf4b">
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageView3"
+                    tools:src="@drawable/browse"
+                    android:layout_alignWithParentIfMissing="false"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentEnd="true" android:layout_alignParentStart="true"/>
+            <TextView
+                    android:textColor="@color/materialcolorpicker__white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/homeScreenBrowseImage"
+                    android:id="@+id/textView3"
+                    android:layout_centerVertical="true" android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp" android:background="#DD212121">
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageView4"
+                    tools:src="@drawable/picture"
+                    android:layout_alignParentTop="true" android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"/>
+            <TextView
+                    android:textColor="@color/materialcolorpicker__white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/homeScreenTakePicture"
+                    android:id="@+id/textView4"
+                    android:layout_centerVertical="true" android:layout_centerHorizontal="true"/>
+        </RelativeLayout>
+    </LinearLayout>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Welcome to Paint tool"
+            android:textSize="20dp"
+            android:textColor="#f6f4ff"
+            android:id="@+id/textView5" android:background="#99f4b831"
+            android:shadowColor="#cbdd5f" android:singleLine="false" android:textColorHighlight="#ddd34e"
+            android:theme="@style/AppBaseTheme" android:typeface="monospace" android:textIsSelectable="true"
+            android:layout_alignParentEnd="true" android:layout_alignParentStart="false"
+            android:layout_alignParentTop="true" android:enabled="false"/>
+
+</RelativeLayout>

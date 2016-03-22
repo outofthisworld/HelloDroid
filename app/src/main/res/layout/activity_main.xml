@@ -1,0 +1,125 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                tools:context=".MainActivity" android:id="@+id/relativeLayout" android:clickable="true"
+                android:background="#FFFF">
+
+    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/relativeLayout2"
+            android:background="@color/background_floating_material_dark"
+            android:layout_alignParentBottom="false"
+            android:layout_alignParentTop="true" android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true">
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/saveButton"
+                android:id="@+id/saveButton"
+                android:layout_alignParentTop="true" android:layout_alignParentStart="true"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Undo"
+                android:id="@+id/undoButton"
+                android:layout_alignParentTop="true" android:layout_toEndOf="@+id/saveButton"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clearButton"
+                android:id="@+id/ClearButton"
+                android:background="@color/background_material_light"
+                android:layout_alignParentTop="true" android:layout_toEndOf="@+id/undoButton"/>
+    </RelativeLayout>
+    <RelativeLayout
+            android:layout_width="80dp"
+            android:layout_height="418dp"
+            android:id="@+id/sidePanel"
+            android:background="@color/background_material_dark"
+            android:layout_below="@+id/relativeLayout2" android:layout_alignStart="@+id/relativeLayout2"
+    >
+        <GridView
+                android:layout_width="82dp"
+                android:layout_height="252dp"
+                android:id="@+id/gridView" android:layout_row="0" android:layout_column="125"
+                android:choiceMode="multipleChoice"
+                android:numColumns="2"
+                android:background="@color/materialcolorpicker__lightgrey"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="10dp"
+                android:padding="5dp"
+                android:gravity="top"
+                android:layout_alignParentStart="true"/>
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/shape"
+                android:id="@+id/shapeButton"
+                android:layout_alignParentBottom="true" android:layout_alignParentStart="true"
+                android:layout_alignParentEnd="true"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/paletteColor"
+                android:layout_centerHorizontal="true" android:layout_below="@+id/gridView"/>
+    </RelativeLayout>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/sidePanel" android:id="@+id/bToolbar2"
+            android:background="@color/background_material_dark"
+            android:layout_below="@+id/sidePanel" android:layout_above="@+id/bToolbar"
+            android:layout_alignEnd="@+id/sidePanel">
+    </RelativeLayout>
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp" android:layout_alignParentBottom="true"
+            android:background="@color/background_material_dark" android:layout_alignParentEnd="true"
+            android:id="@+id/bToolbar" android:layout_toEndOf="@+id/bToolbar2"
+            android:layout_alignStart="@+id/bToolbar2">
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/imageButton6"
+                     android:src="@drawable/ic_brush_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/imageButton9"/>
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/imageButton7"
+                     android:src="@drawable/ic_brush_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/imageButton10"/>
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/imageButton9"
+                     android:src="@drawable/ic_brush_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/imageButton4"/>
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/imageButton10"
+                     android:src="@drawable/ic_brush_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/imageButton6"/>
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/imageButton4"
+                     android:src="@drawable/ic_brush_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/selectionButton"/>
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/selectionButton"
+                     android:src="@drawable/ic_crop_7_5_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/colorPicker"/>
+        <ImageButton android:layout_width="40dp" android:layout_height="40dp" android:id="@+id/colorPicker"
+                     android:src="@drawable/ic_color_lens_black_18dp" android:scaleType="fitXY" android:layout_weight="0.06"
+                     android:clickable="true"
+                     android:layout_alignParentTop="true" android:layout_toEndOf="@+id/imageButton"/>
+        <ImageButton
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/imageButton"
+                android:src="@drawable/ic_brush_black_18dp"
+                android:scaleType="fitXY"
+                android:layout_weight="0.06"
+                android:clickable="true"
+                android:layout_alignParentTop="true" android:layout_alignParentStart="true"/>
+    </RelativeLayout>
+</RelativeLayout>
