@@ -1,4 +1,4 @@
-package ac.nz.hellodroid.app.palette;
+package ac.nz.hellodroid.app.ui.palette;
 
 import ac.nz.hellodroid.app.AppController;
 import android.content.Context;

@@ -14,28 +14,37 @@
             android:layout_height="wrap_content"
             android:id="@+id/relativeLayout2"
             android:background="@color/background_floating_material_dark"
-            android:layout_alignParentBottom="false"
-            android:layout_alignParentTop="true" android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true">
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/saveButton"
-                android:id="@+id/saveButton"
-                android:layout_alignParentTop="true" android:layout_alignParentStart="true"/>
+            android:layout_alignParentTop="true" android:layout_alignParentEnd="true">
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Undo"
                 android:id="@+id/undoButton"
-                android:layout_alignParentTop="true" android:layout_toEndOf="@+id/saveButton"/>
+                android:layout_alignParentTop="true" android:layout_alignBottom="@+id/ClearButton"
+                android:layout_toStartOf="@+id/ClearButton"/>
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/clearButton"
                 android:id="@+id/ClearButton"
                 android:background="@color/background_material_light"
-                android:layout_alignParentTop="true" android:layout_toEndOf="@+id/undoButton"/>
+                android:layout_alignParentTop="true" android:layout_alignParentEnd="true"/>
+        <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/saveButton"
+                android:src="@drawable/saveicon"
+                android:scaleType="fitStart"
+                android:layout_alignParentTop="true" android:layout_alignParentStart="true"
+                android:layout_alignBottom="@+id/undoButton"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="SAVE IMAGE"
+                android:id="@+id/textView6"
+                android:layout_marginEnd="26dp" android:layout_centerVertical="true"
+                android:layout_alignEnd="@+id/saveButton"/>
     </RelativeLayout>
     <RelativeLayout
             android:layout_width="80dp"
@@ -50,7 +59,7 @@
                 android:id="@+id/gridView" android:layout_row="0" android:layout_column="125"
                 android:choiceMode="multipleChoice"
                 android:numColumns="2"
-                android:background="@color/materialcolorpicker__lightgrey"
+                android:background="@color/background_material_light"
                 android:verticalSpacing="10dp"
                 android:horizontalSpacing="10dp"
                 android:padding="5dp"
@@ -61,13 +70,13 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/shape"
                 android:id="@+id/shapeButton"
-                android:layout_alignParentBottom="true" android:layout_alignParentStart="true"
+                android:layout_below="@+id/paletteColor" android:layout_alignParentStart="true"
                 android:layout_alignParentEnd="true"/>
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/paletteColor"
-                android:layout_centerHorizontal="true" android:layout_below="@+id/gridView"/>
+                android:layout_below="@+id/gridView" android:layout_alignParentStart="true"/>
     </RelativeLayout>
     <RelativeLayout
             android:layout_width="match_parent"

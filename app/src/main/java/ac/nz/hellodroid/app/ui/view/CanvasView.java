@@ -1,9 +1,8 @@
-package ac.nz.hellodroid.app.canvas;
+package ac.nz.hellodroid.app.ui.view;
 
 import ac.nz.hellodroid.app.canvas.drawable.DrawableObjectType;
 import ac.nz.hellodroid.app.canvas.drawable.IDrawableItem;
 import ac.nz.hellodroid.app.functional.Consumer;
-import ac.nz.hellodroid.app.palette.ColorClickListener;
 import android.content.Context;
 import android.graphics.*;
 import android.util.DisplayMetrics;
@@ -24,21 +23,18 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class CanvasView extends View implements ScaleGestureDetector.OnScaleGestureListener, View.OnClickListener {
 
     /**
-     * The IDrawableItem to be drawn to this canvas. @see IDrawableItem.
+     * The current paint object used to draw objects onto the canvas.
      */
-    private IDrawableItem currentDrawableObjectType = DrawableObjectType.FREE_HAND;
-
+    private static final Paint paint = new Paint();
     /**
      * The draw queue containing CanvasDrawEvents which is added to via various input events encapsulating information to
      * draw an object onto the canvas.
      */
     private final Queue<CanvasDrawAction> drawQueue = new ArrayBlockingQueue<>(10);
-
     /**
-     * The current paint object used to draw objects onto the canvas.
+     * The IDrawableItem to be drawn to this canvas. @see IDrawableItem.
      */
-    private static final Paint paint = new Paint();
-
+    private IDrawableItem currentDrawableObjectType = DrawableObjectType.FREE_HAND;
     /**
      * The CanvasDrawAction that encapsulates information from various input events.
      */
@@ -83,6 +79,10 @@ public class CanvasView extends View implements ScaleGestureDetector.OnScaleGest
         scaleGestureDetector = new ScaleGestureDetector(context, this);
     }
 
+    public static Paint getPaint() {
+        return paint;
+    }
+
     public Canvas getC() {
         return c;
     }
@@ -125,18 +125,6 @@ public class CanvasView extends View implements ScaleGestureDetector.OnScaleGest
     }
 
     /**
-     * Setc bitmap image drawn by this canvas.
-     *
-     * @param cBitmap the c bitmap
-     */
-    public void setcBitmap(Bitmap cBitmap) {
-        this.cBitmap = cBitmap;
-        c.setBitmap(cBitmap);
-
-        invalidate();
-    }
-
-    /**
      * Gets bitmap.
      *
      * @return the bitmap
@@ -162,6 +150,118 @@ public class CanvasView extends View implements ScaleGestureDetector.OnScaleGest
         return cBitmap;
     }
 
+    /**
+     * Setc bitmap image drawn by this canvas.
+     *
+     * @param cBitmap the c bitmap
+     */
+    public void setcBitmap(Bitmap cBitmap) {
+        this.cBitmap = cBitmap;
+        c.setBitmap(cBitmap);
+
+        invalidate();
+    }
+
+    @Override
+    public boolean onScale(ScaleGestureDetector detector) {
+        return true;
+    }
+
+    @Override
+    public boolean onScaleBegin(ScaleGestureDetector detector) {
+        return true;
+    }
+
+    @Override
+    public void onScaleEnd(ScaleGestureDetector detector) {
+    }
+
+    @Override
+    public void onClick(View v) {
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+    }
+
+    public static final class CanvasDrawAction<T extends InputEvent> {
+        private final Path path;
+        private final Path pointerPath;
+        private final float srcX;
+        private final float srcY;
+        private float currentX;
+        private float currentY;
+        private boolean isFinished = false;
+        private T inputEvent = null;
+        private HashMap<Integer, PointF> pointerCoords = new HashMap<>(10, 10);
+
+        public CanvasDrawAction(float srcX, float srcY) {
+            this.srcX = srcX;
+            this.srcY = srcY;
+            this.currentX = srcX;
+            this.currentY = srcY;
+            this.path = new Path();
+            this.pointerPath = new Path();
+            this.path.moveTo(srcX, srcY);
+        }
+
+        public Path getSecondaryInputPath() {return pointerPath;}
+
+        public float getSrcX() {
+            return srcX;
+        }
+
+        public float getSrcY() {
+            return srcY;
+        }
+
+        public float getCurrentX() {
+            return currentX;
+        }
+
+        public void setCurrentX(float currentX) {
+            this.currentX = currentX;
+        }
+
+        public float getCurrentY() {
+            return currentY;
+        }
+
+        public void setCurrentY(float currentY) {
+            this.currentY = currentY;
+        }
+
+        public int getMultiTouchCount() {
+            return pointerCoords == null ? 0 : pointerCoords.size();
+        }
+
+        public boolean isFinished() {
+            return isFinished;
+        }
+
+        void setFinished(boolean finished) {
+            isFinished = finished;
+        }
+
+        public void addPointer(int i, PointF p) {
+            this.pointerCoords.put(i, p);
+        }
+
+        public void forEachPointer(Consumer<Map.Entry<Integer, PointF>> c) {
+            for (Map.Entry<Integer, PointF> p : pointerCoords.entrySet()) {
+                c.consume(p);
+            }
+        }
+
+        public T getInputEvent() {
+            return inputEvent;
+        }
+
+        public void setInputEvent(T inputEvent) {
+            this.inputEvent = inputEvent;
+        }
+
+        public Path getDrawPath() {
+            return path;
+        }
+    }
 
     private final class CanvasOnTouchListener implements OnTouchListener {
 
@@ -210,25 +310,26 @@ public class CanvasView extends View implements ScaleGestureDetector.OnScaleGest
         }
 
         public void touchMove(final MotionEvent event) {
-            constructDrawActionPath(drawAction.getDrawPath(),drawAction.getCurrentX(), drawAction.getCurrentY(), event.getX(), event.getY());
-                drawAction.forEachPointer(new Consumer<Map.Entry<Integer, PointF>>() {
-                    @Override
-                    public void consume(Map.Entry<Integer, PointF> p) {
-                        PointF origCoords = p.getValue();
-                        MotionEvent.PointerCoords newCoords = new MotionEvent.PointerCoords();
-                        int pointerIndex = event.findPointerIndex(p.getKey());
+            constructDrawActionPath(drawAction.getDrawPath(), drawAction.getCurrentX(), drawAction.getCurrentY(), event.getX(), event.getY());
+            drawAction.forEachPointer(new Consumer<Map.Entry<Integer, PointF>>() {
+                @Override
+                public void consume(Map.Entry<Integer, PointF> p) {
+                    PointF origCoords = p.getValue();
+                    MotionEvent.PointerCoords newCoords = new MotionEvent.PointerCoords();
+                    int pointerIndex = event.findPointerIndex(p.getKey());
 
-                        if (pointerIndex == -1)
-                            return;
+                    if (pointerIndex == -1)
+                        return;
 
-                        event.getPointerCoords(pointerIndex, newCoords);
-                        constructDrawActionPath(drawAction.getSecondaryInputPath(),
-                                origCoords.x, origCoords.y, newCoords.x, newCoords.y);
-                        drawAction.addPointer(event.getPointerId(pointerIndex), new PointF(newCoords.x,newCoords.y));
-                    }});
-            }
+                    event.getPointerCoords(pointerIndex, newCoords);
+                    constructDrawActionPath(drawAction.getSecondaryInputPath(),
+                            origCoords.x, origCoords.y, newCoords.x, newCoords.y);
+                    drawAction.addPointer(event.getPointerId(pointerIndex), new PointF(newCoords.x, newCoords.y));
+                }
+            });
+        }
 
-        public void constructDrawActionPath(Path p,float origX,float origY,float newX,float newY){
+        public void constructDrawActionPath(Path p, float origX, float origY, float newX, float newY) {
             p.moveTo(origX, origY);
             p.quadTo(origX, origY, newX, newY);
             p.lineTo(newX, newY);
@@ -249,104 +350,9 @@ public class CanvasView extends View implements ScaleGestureDetector.OnScaleGest
             for (int i = 0; i < e.getPointerCount(); i++) {
                 MotionEvent.PointerCoords p = new MotionEvent.PointerCoords();
                 e.getPointerCoords(i, p);
-                drawAction.addPointer(e.getPointerId(i), new PointF(p.x,p.y));
+                drawAction.addPointer(e.getPointerId(i), new PointF(p.x, p.y));
             }
         }
 
-    }
-
-    public static Paint getPaint() {
-        return paint;
-    }
-
-    @Override
-    public boolean onScale(ScaleGestureDetector detector) {
-        return true;
-    }
-
-    @Override
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        return true;
-    }
-
-
-    @Override
-    public void onScaleEnd(ScaleGestureDetector detector) {
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-    }
-
-    public static final class CanvasDrawAction<T extends InputEvent> {
-        private final Path path;
-        private final Path pointerPath;
-        private final float srcX;
-        private final float srcY;
-        private float currentX;
-        private float currentY;
-        private boolean isFinished = false;
-        private T inputEvent = null;
-        private HashMap<Integer, PointF> pointerCoords = new HashMap<>(10, 10);
-
-        public CanvasDrawAction(float srcX, float srcY) {
-            this.srcX = srcX;
-            this.srcY = srcY;
-            this.currentX = srcX;
-            this.currentY = srcY;
-            this.path = new Path();
-            this.pointerPath = new Path();
-            this.path.moveTo(srcX, srcY);
-        }
-
-        public Path getSecondaryInputPath() {return pointerPath;}
-
-        public float getSrcX() {
-            return srcX;
-        }
-
-        public float getSrcY() {
-            return srcY;
-        }
-
-        public float getCurrentX() {
-            return currentX;
-        }
-
-        public float getCurrentY() {
-            return currentY;
-        }
-
-        public void setCurrentX(float currentX) {this.currentX = currentX;}
-
-        public void setCurrentY(float currentY) {this.currentY = currentY;}
-
-        public int getMultiTouchCount() {return pointerCoords == null ? 0 : pointerCoords.size();}
-
-        void setFinished(boolean finished) {
-            isFinished = finished;
-        }
-
-        public boolean isFinished() {
-            return isFinished;
-        }
-
-        public void addPointer(int i, PointF p) {this.pointerCoords.put(i, p);}
-
-        public void forEachPointer(Consumer<Map.Entry<Integer, PointF>> c) {
-            for (Map.Entry<Integer, PointF> p : pointerCoords.entrySet()) {
-                c.consume(p);
-            }
-        }
-
-        public T getInputEvent() {return inputEvent;}
-
-        public void setInputEvent(T inputEvent) {this.inputEvent = inputEvent;}
-
-        public Path getDrawPath() {
-            return path;
-        }
     }
 }

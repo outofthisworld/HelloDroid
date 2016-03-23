@@ -1,14 +1,12 @@
-package ac.nz.hellodroid.app.palette;
+package ac.nz.hellodroid.app.ui.palette;
 
-import ac.nz.hellodroid.app.R;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.view.View;
 
 /**
  * Created by Dale on 12/03/16.
+ *
  */
 public class PaletteColor extends View {
     private int color;

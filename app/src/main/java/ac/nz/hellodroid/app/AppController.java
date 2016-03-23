@@ -1,10 +1,12 @@
 package ac.nz.hellodroid.app;
 
 import ac.nz.hellodroid.app.canvas.CanvasOverlay;
-import ac.nz.hellodroid.app.canvas.CanvasView;
 import ac.nz.hellodroid.app.dialog.GenericDialog;
-import ac.nz.hellodroid.app.palette.ColorClickListener;
-import ac.nz.hellodroid.app.palette.PaletteAdapter;
+import ac.nz.hellodroid.app.ui.palette.ColorClickListener;
+import ac.nz.hellodroid.app.ui.palette.PaletteAdapter;
+import ac.nz.hellodroid.app.ui.tabs.ViewPagerAdapter;
+import ac.nz.hellodroid.app.ui.view.CanvasView;
+import ac.nz.hellodroid.app.ui.view.NoSwipeViewPager;
 import ac.nz.hellodroid.app.utils.files.BitmapFileSaveTask;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -12,6 +14,8 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.widget.*;
 import com.pes.androidmaterialcolorpickerdialog.ColorPicker;
@@ -24,12 +28,56 @@ public class AppController extends Activity {
      * The constant LOG_TAG.
      */
     public static final String LOG_TAG = "main_activity";
+    private final ColorClickListener colorPickerListener = new ColorClickListener() {
+        @Override
+        public void colorPicked(int color) {
+            (findViewById(R.id.paletteColor)).setBackgroundColor(color);
+            CanvasView.getPaint().setColor(color);
+        }
 
+        @Override
+        public int currentColor() {
+            return CanvasView.getPaint().getColor();
+        }
+    };
+    private final Button.OnClickListener clearButtonOnClickListnener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+        }
+    };
+    private final Button.OnClickListener selectionButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+        }
+    };
+    private final Button.OnClickListener shapeButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            GenericDialog.showDialog(AppController.this, R.layout.activity_main, "Shape button title", "Select the shape you would like to draw", "Select", "cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+        }
+    };
+    private final Button.OnClickListener eraserOnClickButton = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+        }
+    };
     /**
      * The canvasView.
      */
     private CanvasView c;
-
+    private final Button.OnClickListener undoButtonOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            c.undo();
+        }
+    };
 
     protected void onStart() {
         super.onStart();
@@ -41,7 +89,7 @@ public class AppController extends Activity {
         setContentView(R.layout.activity_main);
 
         //Create a new canvas view
-        c = new CanvasView(getApplicationContext());
+        c = new CanvasView(this);
 
         //Create the palette adapter
         PaletteAdapter paletteAdapter = new PaletteAdapter(this);
@@ -52,11 +100,33 @@ public class AppController extends Activity {
         ((GridView) findViewById(R.id.gridView)).setGravity(GridView.STRETCH_COLUMN_WIDTH);
         ((GridView) findViewById(R.id.gridView)).setVerticalSpacing(40);
 
-        //Create layout
-        RelativeLayout r = (RelativeLayout) findViewById(R.id.relativeLayout);
-        r.addView(c, createActivityLayout());
+        ViewPager v = new NoSwipeViewPager(this);
+        v.setOffscreenPageLimit(ViewPagerAdapter.MAX_PAGES);
+        v.setAdapter(new ViewPagerAdapter(this));
 
-        Button saveButton = (Button) findViewById(R.id.saveButton);
+        TabLayout t = new TabLayout(this);
+        t.setupWithViewPager(v);
+        t.setTabMode(TabLayout.MODE_FIXED);
+        t.setTabTextColors(Color.BLUE, Color.MAGENTA);
+
+        RelativeLayout r = (RelativeLayout) findViewById(R.id.relativeLayout);
+
+        //Create layout params for tab view
+        RelativeLayout.LayoutParams tabParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        tabParams.addRule(RelativeLayout.BELOW, R.id.relativeLayout2);
+        tabParams.addRule(RelativeLayout.RIGHT_OF, R.id.sidePanel);
+        tabParams.addRule(RelativeLayout.ABOVE, v.getId());
+
+        //Create layout params for view pager
+        RelativeLayout.LayoutParams pagerLayout = createActivityLayout();
+        pagerLayout.setMargins(0, 190, 0, 0);
+
+        //Add tab view and pager to relative layout
+        r.addView(t, tabParams);
+        r.addView(v, pagerLayout);
+
+        //Set up button listeners
+        ImageButton saveButton = (ImageButton) findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new SaveButtonClickListener());
 
         //ImageButton eraser = (ImageButton) findViewById(R.id.eraser);
@@ -71,33 +141,31 @@ public class AppController extends Activity {
         ImageButton selectionButton = (ImageButton) findViewById(R.id.selectionButton);
         selectionButton.setOnClickListener(selectionButtonOnClickListener);
 
-        //Undo change button
         Button undoButton = (Button) findViewById(R.id.undoButton);
         undoButton.setOnClickListener(undoButtonOnClickListener);
 
-        findViewById(R.id.paletteColor).setBackgroundColor(c.getPaint().getColor());
+        findViewById(R.id.paletteColor).setBackgroundColor(CanvasView.getPaint().getColor());
 
-        //Creates a overlay for the canvas
-        View canvasOverlayView = LayoutInflater.from(this).inflate(R.layout.activity_main,null);
-        ((RelativeLayout)canvasOverlayView.findViewById(R.id.relativeLayout)).addView(new CanvasOverlay(c,this),createActivityLayout());
+        //Set up canvas overlay
+        View canvasOverlayView = LayoutInflater.from(this).inflate(R.layout.activity_main, null);
+        ((RelativeLayout) canvasOverlayView.findViewById(R.id.relativeLayout)).addView(new CanvasOverlay(c, this), createActivityLayout());
         canvasOverlayView.findViewById(R.id.sidePanel).setEnabled(false);
         canvasOverlayView.findViewById(R.id.sidePanel).setVisibility(View.INVISIBLE);
         canvasOverlayView.setBackgroundColor(Color.TRANSPARENT);
-        addContentView(canvasOverlayView,createActivityLayout());
+        addContentView(canvasOverlayView, createActivityLayout());
         canvasOverlayView.setVisibility(View.INVISIBLE);
     }
-
 
     /**
      * Creates the relative layout params for this activity.
      *
      * @return {@link android.view.ViewGroup.MarginLayoutParams} with rules specific to the layout of this activity.
      */
-    protected ViewGroup.MarginLayoutParams createActivityLayout(){
+    protected RelativeLayout.LayoutParams createActivityLayout() {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(RelativeLayout.RIGHT_OF,R.id.sidePanel);
-        layoutParams.addRule(RelativeLayout.BELOW,R.id.relativeLayout2);
-        layoutParams.addRule(RelativeLayout.ABOVE,R.id.bToolbar);
+        layoutParams.addRule(RelativeLayout.RIGHT_OF, R.id.sidePanel);
+        layoutParams.addRule(RelativeLayout.ABOVE, R.id.bToolbar);
+        layoutParams.addRule(RelativeLayout.BELOW, R.id.relativeLayout2);
         return layoutParams;
     }
 
@@ -132,7 +200,7 @@ public class AppController extends Activity {
      * @class ColorPickerListener
      * A listener for a color picker button.
      */
-    private static final class ColorPickerListener implements View.OnClickListener{
+    private static final class ColorPickerListener implements View.OnClickListener {
         private final Activity a;
         private final ColorClickListener listener;
 
@@ -142,7 +210,7 @@ public class AppController extends Activity {
          * @param a        the a
          * @param listener the listener
          */
-        public ColorPickerListener(Activity a, ColorClickListener listener){
+        public ColorPickerListener(Activity a, ColorClickListener listener) {
             this.a = a;
             this.listener = listener;
         }
@@ -172,7 +240,7 @@ public class AppController extends Activity {
          * @param currentColor the 32bit ARGB value
          * @return an int[] consisting of the RGB components of the 32 bit ARGB value.
          */
-        private final int[] argbToRGB(int currentColor){
+        private final int[] argbToRGB(int currentColor) {
             int[] rgb = new int[3];
 
             //Shift each color to the least significant byte and mask out the higher bits (ignore the alpha channel)
@@ -188,17 +256,17 @@ public class AppController extends Activity {
 
         @Override
         public void onClick(View v) {
-            GenericDialog.showDialog(AppController.this,R.layout.save_dialog, getResources().getString(R.string.saveDialogTitle) , "", getResources().getString(R.string.saveButton) , getResources().getString(R.string.clearButton) , new DialogInterface.OnClickListener() {
+            GenericDialog.showDialog(AppController.this, R.layout.save_dialog, getResources().getString(R.string.saveDialogTitle), "", getResources().getString(R.string.saveButton), getResources().getString(R.string.clearButton), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String fileName = ((EditText)((AlertDialog)dialog).findViewById(R.id.fileEntry)).getText().toString();
-                    String suffix =   ((Spinner)((AlertDialog)dialog).findViewById(R.id.spinner)).getSelectedItem().toString();
-                    if(isExternalStorageWritable() && fileName.length() != 0) {
-                        saveBitmap(fileName,suffix);
-                    }else if(!isExternalStorageWritable()){
+                    String fileName = ((EditText) ((AlertDialog) dialog).findViewById(R.id.fileEntry)).getText().toString();
+                    String suffix = ((Spinner) ((AlertDialog) dialog).findViewById(R.id.spinner)).getSelectedItem().toString();
+                    if (isExternalStorageWritable() && fileName.length() != 0) {
+                        saveBitmap(fileName, suffix);
+                    } else if (!isExternalStorageWritable()) {
                         Toast.makeText(AppController.this, getString(R.string.saveFileErrorTwo), Toast.LENGTH_LONG).show();
-                    }else{
-                        ((AlertDialog)dialog).setMessage("Enter valid name");
+                    } else {
+                        ((AlertDialog) dialog).setMessage("Enter valid name");
                     }
                 }
             });
@@ -209,7 +277,7 @@ public class AppController extends Activity {
          *
          * @return void
          */
-        private void saveBitmap(String fileName, String suffix){
+        private void saveBitmap(String fileName, String suffix) {
             new BitmapFileSaveTask(c.getcBitmap(), Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath(),
                     fileName, suffix) {
                 @Override
@@ -219,7 +287,7 @@ public class AppController extends Activity {
                         @Override
                         public void run() {
                             if (!success) {
-                                Toast.makeText(getApplicationContext(), getString(R.string.saveFileError) , Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), getString(R.string.saveFileError), Toast.LENGTH_LONG).show();
                             } else {
                                 Toast.makeText(getApplicationContext(), getString(R.string.saveFileSuccess), Toast.LENGTH_LONG).show();
                             }
@@ -236,63 +304,7 @@ public class AppController extends Activity {
          */
         private boolean isExternalStorageWritable() {
             String state = Environment.getExternalStorageState();
-            if (Environment.MEDIA_MOUNTED.equals(state)) {
-                return true;
-            }
-            return false;
+            return Environment.MEDIA_MOUNTED.equals(state);
         }
     }
-
-    private final ColorClickListener colorPickerListener = new ColorClickListener() {
-        @Override
-        public void colorPicked(int color) {
-            (findViewById(R.id.paletteColor)).setBackgroundColor(color);
-            c.getPaint().setColor(color);
-        }
-
-        @Override
-        public int currentColor() {
-            return c.getPaint().getColor();
-        }
-    };
-
-    private final Button.OnClickListener clearButtonOnClickListnener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-        }
-    };
-
-    private final Button.OnClickListener selectionButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-
-        }
-    };
-
-    private final Button.OnClickListener shapeButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            GenericDialog.showDialog(AppController.this, R.layout.activity_main, "Shape button title", "Select the shape you would like to draw", "Select", "cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                }
-            });
-        }
-    };
-
-    private final Button.OnClickListener undoButtonOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            c.undo();
-        }
-    };
-
-
-    private final Button.OnClickListener eraserOnClickButton = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-        }
-    };
 }

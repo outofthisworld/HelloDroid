@@ -1,4 +1,4 @@
-package ac.nz.hellodroid.app.palette;
+package ac.nz.hellodroid.app.ui.palette;
 
 /**
  * Created by Dale on 12/03/16.

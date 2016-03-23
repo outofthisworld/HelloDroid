@@ -1,11 +1,9 @@
 package ac.nz.hellodroid.app.dialog;
 
-import ac.nz.hellodroid.app.AppController;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 
 /**
  * Created by Dale on 19/03/16.
@@ -28,21 +26,21 @@ public abstract class GenericDialog implements AlertDialog.OnClickListener {
         populate();
     }
 
-    protected final Dialog populate(){
+    public static void showDialog(Context c, int layoutRes, String title, String message, String posBtnName, String negBtnName, final AlertDialog.OnClickListener listener) {
+        new GenericDialog(c, layoutRes, title, message, posBtnName, negBtnName) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                listener.onClick(dialog, which);
+            }
+        }.populate().show();
+    }
+
+    protected final Dialog populate() {
         return dialogBuilder.setNegativeButton(negativeBtnTitle.toString(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Log.v(AppController.LOG_TAG,"in here");
+                dialog.cancel();
             }
-        }).setView(viewResID).setTitle(title).setMessage(message).setPositiveButton(posBtnTitle,this).create();
-    }
-
-    public static void showDialog(Context c, int layoutRes, String title, String message, String posBtnName, String negBtnName, final AlertDialog.OnClickListener listener){
-        new GenericDialog(c, layoutRes, title, message, posBtnName, negBtnName){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                listener.onClick(dialog,which);
-            }
-        }.populate().show();
+        }).setView(viewResID).setTitle(title).setMessage(message).setPositiveButton(posBtnTitle, this).create();
     }
 }

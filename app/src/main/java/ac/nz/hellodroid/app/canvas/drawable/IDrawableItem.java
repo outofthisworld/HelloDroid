@@ -1,10 +1,9 @@
 package ac.nz.hellodroid.app.canvas.drawable;
 
-import ac.nz.hellodroid.app.canvas.CanvasView;
+import ac.nz.hellodroid.app.ui.view.CanvasView;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.InputEvent;
-import android.view.MotionEvent;
 
 /**
  * The interface IDrawableItem.

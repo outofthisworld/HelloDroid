@@ -1,8 +1,12 @@
 package ac.nz.hellodroid.app.canvas;
 
 import ac.nz.hellodroid.app.AppController;
+import ac.nz.hellodroid.app.ui.view.CanvasView;
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -14,9 +18,9 @@ import android.view.View;
 public class CanvasOverlay extends View implements View.OnTouchListener,GestureDetector.OnGestureListener,GestureDetector.OnDoubleTapListener {
     private final Paint p = new Paint();
     private final RectF overlay = new RectF();
-    private boolean moveOverlay = true;
     private final GestureDetector g;
     private final CanvasView c;
+    private boolean moveOverlay = true;
 
     public CanvasOverlay(CanvasView view,Context context) {
         super(context);
